@@ -13,11 +13,9 @@ const loginUser = async (email, password) => {
     }
 
     // Compara a senha fornecida com a senha encriptografada no banco de dados
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
+    if (password !== user.password) {
         throw new Error('E-mail ou senha incorretos');
-    }
+    }    
 
     // Define tempo de expiração baseado na role
     const expiresIn = user.role === 'admin' ? '12h' : '7d';
