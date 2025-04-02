@@ -10,7 +10,7 @@ const arquivosRoutes = require('./routes/arquivosRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const allowedOrigins = [
-  "http://localhost:3000",                   // para desenvolvimento local
+  "http://localhost:3306",                   // para desenvolvimento local
   "https://admin-psi-sage.vercel.app"          // coloque o domínio real da Vercel
 ];
 
