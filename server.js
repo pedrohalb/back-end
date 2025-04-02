@@ -9,9 +9,16 @@ const topicosRoutes = require('./routes/topicosRoutes');
 const arquivosRoutes = require('./routes/arquivosRoutes');
 const authRoutes = require('./routes/authRoutes');
 
+const allowedOrigins = [
+  "http://localhost:3000",                   // para desenvolvimento local
+  "https://admin-psi-sage.vercel.app"          // coloque o domínio real da Vercel
+];
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 // Testa conexão com o MySQL
