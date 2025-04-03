@@ -189,6 +189,12 @@ const EditalModel = {
       JOIN materias m ON em.materia_id = m.id
       WHERE em.edital_id = ?`;
 
+      console.log('Executando query com os parâmetros:', {
+        editalId,
+        limitInt,
+        offset
+      });
+      
     const [materias] = await db.execute(query, [editalId, limitInt, offset]);
     const [[{ total }]] = await db.execute(countQuery, [editalId]);
 
