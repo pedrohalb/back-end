@@ -172,8 +172,9 @@ const EditalModel = {
         m.id, 
         m.nome, 
         m.status, 
-        m.deleted_at,  
-        COUNT(t.id) AS numero_topicos
+        m.deleted_at,
+        em.created_at,
+        COUNT(DISTINCT t.id) AS numero_topicos
       FROM 
         editais_materias em
       JOIN 
@@ -187,7 +188,7 @@ const EditalModel = {
       ORDER BY 
         em.created_at ASC
       LIMIT ? OFFSET ?`;
-  
+
     const countQuery = `
       SELECT COUNT(DISTINCT m.id) AS total
       FROM editais_materias em
