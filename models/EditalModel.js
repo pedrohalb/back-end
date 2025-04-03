@@ -167,6 +167,7 @@ const EditalModel = {
       throw new Error('editalId inválido');
     }
   
+    // Interpolando LIMIT e OFFSET diretamente no SQL
     const query = `
       SELECT 
         m.id, 
@@ -180,12 +181,12 @@ const EditalModel = {
       JOIN 
         materias m ON em.materia_id = m.id
       WHERE 
-        em.edital_id = ? 
+        em.edital_id = ?
       ORDER BY 
         em.created_at ASC
-      LIMIT ? OFFSET ?
-      `;
-
+      LIMIT ${limitInt} OFFSET ${offset}
+    `;
+  
     const countQuery = `
       SELECT COUNT(DISTINCT m.id) AS total
       FROM editais_materias em
@@ -199,7 +200,8 @@ const EditalModel = {
         offset
       });
   
-      const [materias] = await db.execute(query, [editalIdInt, limitInt, offset]);
+      // Apenas editalId como parâmetro, pois limit/offset estão interpolados
+      const [materias] = await db.execute(query, [editalIdInt]);
       const [[{ total }]] = await db.execute(countQuery, [editalIdInt]);
   
       return {
@@ -215,7 +217,7 @@ const EditalModel = {
       console.error('Erro completo:', err);
       throw new Error(`Erro ao buscar matérias do edital: ${err.message}`);
     }    
-  },
+  },  
 
   // Atualizar um edital
   updateEdital: async (id, nome, status) => {
