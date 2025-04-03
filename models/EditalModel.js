@@ -158,16 +158,21 @@ const EditalModel = {
   },
 
   getMateriasByEditalId: async (editalId, page = 1, limit = 10, sort = 'created_at', order = 'ASC') => {
-    const pageInt = parseInt(page, 10) || 1;
-    const limitInt = parseInt(limit, 10) || 10;
+    const pageInt = Number(page) || 1;
+    const limitInt = Number(limit) || 10;
     const offset = (pageInt - 1) * limitInt;
-
-    const query = 
-      `SELECT 
+    const editalIdInt = Number(editalId);
+  
+    if (!editalIdInt || isNaN(editalIdInt)) {
+      throw new Error('editalId inválido');
+    }
+  
+    const query = `
+      SELECT 
         m.id, 
         m.nome, 
         m.status, 
-        m.deleted_at,  -- Incluir informação de exclusão
+        m.deleted_at,  
         COUNT(t.id) AS numero_topicos
       FROM 
         editais_materias em
@@ -182,32 +187,38 @@ const EditalModel = {
       ORDER BY 
         em.created_at ASC
       LIMIT ? OFFSET ?`;
-
-    const countQuery = 
-      `SELECT COUNT(DISTINCT m.id) AS total
+  
+    const countQuery = `
+      SELECT COUNT(DISTINCT m.id) AS total
       FROM editais_materias em
       JOIN materias m ON em.materia_id = m.id
       WHERE em.edital_id = ?`;
-
-      console.log('Executando query com os parâmetros:', {
-        editalId,
+  
+    try {
+      console.log('Parâmetros enviados para o execute:', {
+        editalIdInt,
         limitInt,
         offset
       });
-      
-    const [materias] = await db.execute(query, [editalId, limitInt, offset]);
-    const [[{ total }]] = await db.execute(countQuery, [editalId]);
-
-    return {
-      totalItems: total,
-      currentPage: pageInt,
-      totalPages: Math.ceil(total / limitInt),
-      items: materias.map((materia) => ({
-        ...materia,
-        isDeleted: materia.deleted_at !== null,  // Novo campo indicando exclusão
-      })),
-    };
+  
+      const [materias] = await db.execute(query, [editalIdInt, limitInt, offset]);
+      const [[{ total }]] = await db.execute(countQuery, [editalIdInt]);
+  
+      return {
+        totalItems: total,
+        currentPage: pageInt,
+        totalPages: Math.ceil(total / limitInt),
+        items: materias.map((materia) => ({
+          ...materia,
+          isDeleted: materia.deleted_at !== null,
+        })),
+      };
+    } catch (err) {
+      console.error('Erro ao executar queries:', err);
+      throw new Error('Erro ao buscar matérias do edital.');
+    }
   },
+  
 
   // Atualizar um edital
   updateEdital: async (id, nome, status) => {
