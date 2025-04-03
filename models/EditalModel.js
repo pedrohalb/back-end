@@ -214,11 +214,10 @@ const EditalModel = {
         })),
       };
     } catch (err) {
-      console.error('Erro ao executar queries:', err);
-      throw new Error('Erro ao buscar matérias do edital.');
-    }
+      console.error('Erro completo:', err);
+      throw new Error(`Erro ao buscar matérias do edital: ${err.message}`);
+    }    
   },
-  
 
   // Atualizar um edital
   updateEdital: async (id, nome, status) => {
